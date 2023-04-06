@@ -309,7 +309,7 @@ jobs:
             npm run build
             cd ..
             # Zip the directory
-            tar -C backend -czvf .circleci/ansible/roles/deploy/files/artifact.tar.gz 
+            tar -C backend -czvf .circleci/ansible/roles/deploy/files/artifact.tar.gz .
             echo "ensure that the artifact has coppied"
             ls .circleci/ansible/roles/deploy/files/
             cd .circleci/ansible
