@@ -32,7 +32,7 @@ commands:
       - run:
           name: Install utilities
           command: |
-              yum install tar gzip
+              yum install -y tar gzip
 
             
   install_ansible:
