@@ -215,7 +215,7 @@ jobs:
     docker:
       - image: cimg/base:stable
     steps:
-      - checkout
+      - checkout  
       - install_awscli                 # we need it for destroying the environment
       - install_ansible          
       - add_ssh_keys:
