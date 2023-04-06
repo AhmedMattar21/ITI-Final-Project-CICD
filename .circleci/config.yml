@@ -27,12 +27,12 @@ commands:
             sudo ./aws/install
   
   install-utilities:
-    description: Install AWS CLI V2
+    description: Install utilities
     steps:
       - run:
-          name: Install AWS CLI V2
+          name: Install utilities
           command: |
-              sudo apt install tar gzip
+              apt install tar gzip
 
             
   install_ansible:
