@@ -43,7 +43,7 @@ commands:
           command: |
             sudo apt -y install software-properties-common
             sudo apt-add-repository ppa:ansible/ansible
-            sudo apt instal -y ansible
+            sudo apt install -y ansible
 
   install_nodejs:
     description: Install Node.js 13
@@ -176,8 +176,8 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - install-utilities
       - install_awscli
+      - install-utilities
       - run:
           name: Ensure back-end infrastructure exists
           command: |
@@ -216,8 +216,8 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - install_ansible
-      - install_awscli            # we need it for destroying the environment
+      - install_awscli                 # we need it for destroying the environment
+      - install_ansible          
       - add_ssh_keys:
           fingerprints:
             - "87:41:86:7c:5d:86:fd:2d:1f:ab:92:6c:a1:f9:5a:2d"
@@ -260,8 +260,8 @@ jobs:
        - image: cimg/node:13.8.0
     steps:
       - checkout
-      - install-utilities
       - install_awscli
+      - install-utilities
       - attach_workspace:
           at: ~/
       - run:
@@ -322,8 +322,8 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - install-utilities
       - install_awscli
+      - install-utilities
       - run:
           name: Get backend url and 
           command: |
@@ -358,20 +358,20 @@ jobs:
       - destroy-environment
       - revert-migrations  
 
-#   cloudfront-update:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Update cloudfront distribution
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  cloudfront-update:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            # your code here
+      # Here's where you will add some code to rollback on failure  
 
 # cleanup:
 #     docker:
