@@ -43,7 +43,7 @@ commands:
           command: |
             sudo apt -y install software-properties-common
             sudo apt-add-repository ppa:ansible/ansible
-            sudo apt install ansible
+            sudo apt instal -y ansible
 
   install_nodejs:
     description: Install Node.js 13
@@ -325,17 +325,36 @@ jobs:
       - install-utilities
       - install_awscli
       - run:
-          name: Get backend url
+          name: Get backend url and 
           command: |
-            # your code here
+            # Fetch and prepare the BACKEND_IP env var
+             export BACKEND_IP=$(aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text)
+
       - run:
           name: Backend smoke test.
           command: |
-            # your code here
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+              return 0
+            else
+              return 1
+            fi
       - run:
           name: Frontend smoke test.
           command: |
-            # your code here
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/#/employees"
+            echo ${URL}
+            if curl -s ${URL} | grep "Welcome"
+            then
+            return 0
+            else
+            return 1
+            fi
       - destroy-environment
       - revert-migrations  
 
@@ -400,8 +419,8 @@ workflows:
           requires: [run-migrations]  
       - deploy-backend:
           requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
       #     requires: [smoke-test]
       # - cleanup:
