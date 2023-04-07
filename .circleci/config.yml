@@ -6,13 +6,15 @@ commands:
     parameters:
       Workflow_ID:
         type: string
-        default: ${CIRCLE_WORKFLOW_ID:0:7}
+        default: ${CIRCLE_WORKFLOW_ID:0:7}          # unique id for each workflow [Circle ci env variable]
     steps:
       - run:
           name: Destroy environments
-          when: on_fail
+          when: on_fail                             # only execute on fail
           command: |
+            # Remove the stack
             aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.Workflow_ID >>
+            # empty s3 bucket to be able to delete the stack
             aws s3 rm s3://udapeople-<<parameters.Workflow_ID>> --recursive
             aws cloudformation delete-stack --stack-name updapeople-frontend-<< parameters.Workflow_ID >>
 
@@ -56,8 +58,6 @@ commands:
             sudo npm install --global n
             sudo n 13.8.0
             
-
-
   revert-migrations:
       description: Revert the last migration if successfully run in the current workflow.
       parameters:
@@ -69,7 +69,7 @@ commands:
             name: Revert migrations
             when: on_fail
             command: |
-              # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+              # we set kvdb key with 1 when the migration success so if it's 1 means migration has been done
               SUCCESS=$(curl --insecure https://kvdb.io/B4XWzZ9ceEmKQumww8rqvh/migration_<< parameters.Workflow_ID >>)
               if(( $SUCCESS==1 )); 
               then
@@ -77,13 +77,14 @@ commands:
                 npm install
                 npm run migration:revert 
               fi
-            
+
+# these jobs are run on on circle ci containers            
 jobs:
   build-frontend:
     docker:
-      - image: cimg/node:13.8.0
+      - image: cimg/node:13.8.0 
     steps:
-      - checkout
+      - checkout                  # means pull git files [update]
       - restore_cache:
           keys: [frontend-build]
       - run:
